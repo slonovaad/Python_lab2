@@ -1,8 +1,14 @@
 [project]
-name = "labs"
+name = "lab2"
 version = "0.1.0"
-description = "Add your description here"
+description = "Interactive terminal"
 requires-python = ">=3.12"
-dependencies = [
-    "pytest>=8.4.2",
-]
+
+[tool.mypy]
+
+[[tool.mypy.overrides]]
+module = ["src.parse", "src.commands.undo"]
+disable_error_code = ["union-attr"]
+[[tool.mypy.overrides]]
+module = ["src.commands.grep"]
+disable_error_code = ["assignment", "call-overload"]

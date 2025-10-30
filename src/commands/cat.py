@@ -1,0 +1,34 @@
+import os
+import logging
+from src.error_messages import (not_exist_error_message, invalid_arguments_error_message,
+                                access_error_message, wrong_type_error_message,
+                                decode_error_message)
+
+
+def cat(options: list[str], paths: list[str]) -> None:
+    """
+    Функция, реализующая команду cat
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: Данная функция ничего не возвращает
+    """
+    if len(paths) != 1 or len(options) != 0:
+        invalid_arguments_error_message("cat")
+        return
+    name = os.path.abspath(paths[0])
+    if not(os.path.exists(name)):
+        not_exist_error_message("cat", "file", paths[0])
+        return
+    if not(os.path.isfile(name)):
+        wrong_type_error_message("cat", "file", paths[0])
+        return
+    try:
+        with open(name, "rb") as file:
+            print(file.read().decode())
+    except PermissionError:
+        access_error_message("cat", "file", paths[0])
+        return
+    except UnicodeDecodeError:
+        decode_error_message("cat", paths[0])
+        return
+    logging.info("Success")
