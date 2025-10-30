@@ -15,7 +15,7 @@ def tar(options: list[str], paths: list[str]) -> None:
     :return: Данная функция ничего не возвращает
     """
 
-    if len(options) != 0 or not(1 <= len(paths) <= 2):
+    if len(options) != 0 or not (1 <= len(paths) <= 2):
         invalid_arguments_error_message("tar")
         return
 
@@ -25,12 +25,12 @@ def tar(options: list[str], paths: list[str]) -> None:
         if paths[1][-1] in "/\\":
             destination = os.path.join(destination, os.path.basename(source) + ".tar.gz")
     else:
-        destination = source + ".tar.gz"
-    if not(os.path.exists(source)):
+        if os.path.isdir(source):
+            destination = source + ".tar.gz"
+        else:
+            destination = os.path.splitext(source)[0] + ".tar.gz"
+    if not (os.path.exists(source)):
         not_exist_error_message("tar", "directory", paths[0])
-        return
-    if not(os.path.isdir(source)):
-        wrong_type_error_message("tar", "directory", paths[0])
         return
     if Path(source) in Path(destination).parents:
         in_parents_error_message("tar", paths[0], paths[1])
@@ -42,10 +42,13 @@ def tar(options: list[str], paths: list[str]) -> None:
     try:
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         with tarfile.open(destination, "w:gz") as tf:
-            for current_dir, _, files in os.walk(source):
-                for file in files:
-                    abs_path = os.path.join(current_dir, file)
-                    tf.add(abs_path, arcname=os.path.relpath(abs_path, source))
+            if os.path.isdir(source):
+                for current_dir, _, files in os.walk(source):
+                    for file in files:
+                        abs_path = os.path.join(current_dir, file)
+                        tf.add(abs_path, arcname=os.path.relpath(abs_path, source))
+            else:
+                tf.add(source, arcname=os.path.basename(source))
     except PermissionError:
         if len(paths) == 2:
             access_error_message("tar", "directory or file",

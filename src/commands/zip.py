@@ -25,12 +25,12 @@ def zip(options: list[str], paths: list[str]) -> None:
         if paths[1][-1] in "/\\":
             destination = os.path.join(destination, os.path.basename(source) + ".zip")
     else:
-        destination = source + ".zip"
+        if os.path.isdir(source):
+            destination = source + ".zip"
+        else:
+            destination = os.path.splitext(source)[0] + ".zip"
     if not (os.path.exists(source)):
         not_exist_error_message("zip", "directory", paths[0])
-        return
-    if not (os.path.isdir(source)):
-        wrong_type_error_message("zip", "directory", paths[0])
         return
     if Path(source) in Path(destination).parents:
         in_parents_error_message("zip", paths[0], paths[1])
@@ -42,10 +42,13 @@ def zip(options: list[str], paths: list[str]) -> None:
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         with zipfile.ZipFile(destination, mode='w',
                              compression=zipfile.ZIP_DEFLATED) as zf:
-            for current_dir, _, files in os.walk(source):
-                for file in files:
-                    abs_path = os.path.join(current_dir, file)
-                    zf.write(abs_path, arcname=os.path.relpath(abs_path, source))
+            if os.path.isdir(source):
+                for current_dir, _, files in os.walk(source):
+                    for file in files:
+                        abs_path = os.path.join(current_dir, file)
+                        zf.write(abs_path, arcname=os.path.relpath(abs_path, source))
+            else:
+                zf.write(source, arcname=os.path.basename(source))
     except PermissionError:
         if len(paths) == 2:
             access_error_message("zip", "directory or file",

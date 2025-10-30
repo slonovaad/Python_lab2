@@ -39,18 +39,6 @@ class ZipTestCase(unittest.TestCase):
             mock_zip.assert_not_called()
             mock_error.assert_called_once_with("zip", "directory", source)
 
-    def test_not_is_dir(self):
-        with (patch("src.commands.zip.wrong_type_error_message") as mock_error,
-              patch("zipfile.ZipFile") as mock_zip,
-              patch("os.path.exists") as mock_exist,
-              patch("os.path.isdir") as mock_isdir):
-            mock_exist.return_value = True
-            mock_isdir.return_value = False
-            source, destination = "path1", "path2.zip"
-            zip([], [source, destination])
-            mock_zip.assert_not_called()
-            mock_error.assert_called_once_with("zip", "directory", source)
-
     def test_source_in_parents_of_destination(self):
         with (patch("src.commands.zip.in_parents_error_message") as mock_error,
               patch("zipfile.ZipFile") as mock_zip,
@@ -79,11 +67,30 @@ class ZipTestCase(unittest.TestCase):
         with (patch("logging.info") as mock_log,
               patch("zipfile.ZipFile") as mock_zip,
               patch("os.path.exists") as mock_exist,
-              patch("os.path.isdir") as mock_isdir):
+              patch("os.path.isdir") as mock_isdir,
+              patch("os.makedirs") as mock_makedirs):
             mock_exist.return_value = True
             mock_isdir.return_value = True
             source, destination = "path1", "path2.zip"
             zip([], [source, destination])
+            mock_makedirs.assert_called_once_with(os.path.dirname(os.path.abspath(destination)),
+                                                  exist_ok=True)
+            mock_zip.assert_called_once_with(os.path.abspath(destination), mode='w',
+                                             compression=zipfile.ZIP_DEFLATED)
+            mock_log.assert_called_once_with("Success")
+
+    def test_correct_file(self):
+        with (patch("logging.info") as mock_log,
+              patch("zipfile.ZipFile") as mock_zip,
+              patch("os.path.exists") as mock_exist,
+              patch("os.path.isdir") as mock_isdir,
+              patch("os.makedirs") as mock_makedirs):
+            mock_exist.return_value = True
+            mock_isdir.return_value = False
+            source, destination = "path1", "path2.zip"
+            zip([], [source, destination])
+            mock_makedirs.assert_called_once_with(os.path.dirname(os.path.abspath(destination)),
+                                                  exist_ok=True)
             mock_zip.assert_called_once_with(os.path.abspath(destination), mode='w',
                                              compression=zipfile.ZIP_DEFLATED)
             mock_log.assert_called_once_with("Success")
