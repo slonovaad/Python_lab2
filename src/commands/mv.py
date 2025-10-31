@@ -6,7 +6,8 @@ from src.make_reserve_copy import make_reserve_copy
 from src.write_to_history import write_to_history
 from src.constants.constants import HISTORY_FILE, UNDO_HISTORY_FILE, TRASH_DIRECTORY
 from src.error_messages import (not_exist_error_message, invalid_arguments_error_message,
-                                access_error_message, in_parents_error_message)
+                                access_error_message, in_parents_error_message,
+                                is_current_dir_error_message)
 
 
 def mv(options: list[str], paths: list[str]) -> None:
@@ -36,6 +37,12 @@ def mv(options: list[str], paths: list[str]) -> None:
             or Path(TRASH_DIRECTORY) in Path(destination).parents):
         access_error_message("mv", "file or directory", paths[1], action="change")
         return
+    if source == os.getcwd():
+        is_current_dir_error_message("mv", paths[0], action="move")
+        return
+    if destination == os.getcwd():
+        is_current_dir_error_message("mv", paths[1], action="move")
+        return
     if Path(source) in Path(destination).parents:
         in_parents_error_message("mv", paths[0], paths[1])
         return
@@ -45,11 +52,11 @@ def mv(options: list[str], paths: list[str]) -> None:
     if source == os.path.abspath("/") or source == os.path.expanduser("~"):
         access_error_message("mv", "directory", paths[0], action="change")
         return
-    if not(os.access(source, os.W_OK)):
+    if not (os.access(source, os.W_OK)):
         access_error_message("mv", "file or directory", paths[0], action="change")
         return
     if os.path.exists(destination):
-        if not(os.access(destination, os.W_OK)):
+        if not (os.access(destination, os.W_OK)):
             access_error_message("mv", "file or directory", paths[1], action="change")
             return
     os.makedirs(os.path.dirname(destination), exist_ok=True)

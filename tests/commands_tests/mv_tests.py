@@ -73,6 +73,26 @@ class MvTestCase(unittest.TestCase):
                                                os.path.join(TRASH_DIRECTORY, "path1"),
                                                action="change")
 
+    def test_source_is_current_dir(self):
+        with (patch("src.commands.mv.is_current_dir_error_message") as mock_error,
+              patch("os.rename") as mock_rename,
+              patch("os.path.exists") as mock_exists):
+            mock_exists.return_value = True
+            mv([], [os.getcwd(), "path2"])
+            mock_rename.assert_not_called()
+            mock_error.assert_called_once_with("mv", os.getcwd(),
+                                               action="move")
+
+    def test_destination_is_current_dir(self):
+        with (patch("src.commands.mv.is_current_dir_error_message") as mock_error,
+              patch("os.rename") as mock_rename,
+              patch("os.path.exists") as mock_exists):
+            mock_exists.return_value = True
+            mv([], ["path1", os.getcwd()])
+            mock_rename.assert_not_called()
+            mock_error.assert_called_once_with("mv", os.getcwd(),
+                                               action="move")
+
     def test_source_is_not_allowed(self):
         with (patch("src.commands.mv.access_error_message") as mock_error,
               patch("os.rename") as mock_rename,
