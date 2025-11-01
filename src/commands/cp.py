@@ -61,18 +61,13 @@ def cp(options: list[str], paths: list[str]) -> None:
             print("To copy a file don't use -r")
             return
         try:
-            if paths[1][-1] in '/\\':
-                if os.path.exists(destination):
-                    make_reserve_copy(destination)
-                os.makedirs(destination, exist_ok=True)
-                shutil.copytree(source, destination, dirs_exist_ok=True)
-            else:
+            if paths[1][-1] not in '/\\':
                 if os.path.isdir(destination):
                     destination = os.path.join(destination, os.path.basename(source))
-                if os.path.exists(destination):
-                    make_reserve_copy(destination)
-                os.makedirs(destination, exist_ok=True)
-                shutil.copytree(source, destination, dirs_exist_ok=True)
+            if os.path.exists(destination):
+                make_reserve_copy(destination)
+            os.makedirs(destination, exist_ok=True)
+            shutil.copytree(source, destination, dirs_exist_ok=True)
         except PermissionError:
             access_error_message("cp", "directory", f"{paths[0]} or {paths[1]}",
                                  action="read or change")
