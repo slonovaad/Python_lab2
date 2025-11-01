@@ -1,8 +1,7 @@
 import os
 import logging
 from src.error_messages import (not_exist_error_message, invalid_arguments_error_message,
-                                access_error_message, wrong_type_error_message,
-                                decode_error_message)
+                                access_error_message, wrong_type_error_message)
 
 
 def cat(options: list[str], paths: list[str]) -> None:
@@ -29,6 +28,6 @@ def cat(options: list[str], paths: list[str]) -> None:
         access_error_message("cat", "file", paths[0])
         return
     except UnicodeDecodeError:
-        decode_error_message("cat", paths[0])
-        return
+        with open(name, "rb") as file:
+            print(file.read())
     logging.info("Success")

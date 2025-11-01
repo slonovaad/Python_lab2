@@ -1,6 +1,6 @@
 import unittest
 import os.path
-from unittest.mock import patch
+from unittest.mock import patch, call
 from src.commands.cat import cat
 
 
@@ -78,13 +78,17 @@ class CatTestCase(unittest.TestCase):
     def test_cant_decode(self):
         with (patch("src.commands.cat.open") as mock_open,
               patch("src.commands.cat.print") as mock_print,
-              patch("src.commands.cat.decode_error_message") as mock_error,
               patch("os.path.exists") as mock_exists,
-              patch("os.path.isfile") as mock_isfile):
+              patch("os.path.isfile") as mock_isfile,
+              patch("logging.info") as mock_log):
             mock_exists.return_value = True
             mock_isfile.return_value = True
-            mock_open.side_effect = UnicodeDecodeError("utf-8", b"", 0, 0, "invalid start byte")
+            mock_file = mock_open.return_value.__enter__.return_value
+            mock_open.side_effect = [UnicodeDecodeError("utf-8", b"", 0, 0, "invalid start byte"), mock_file]
+            mock_open.side_effect
             cat([], ["file_path"])
-            mock_open.assert_called_once_with(os.path.abspath("file_path"), "rb")
-            mock_print.assert_not_called()
-            mock_error.assert_called_once_with("cat", "file_path")
+            self.assertEqual(mock_open.call_args_list,
+                             [call(os.path.abspath("file_path"), "rb"),
+                              call(os.path.abspath("file_path"), "rb")])
+            mock_print.assert_called_once()
+            mock_log.assert_called_once_with("Success")
