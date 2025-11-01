@@ -31,10 +31,6 @@ def main() -> None:
             continue
         if command in COMMANDS:
             COMMANDS[command](options, arguments)
-        elif command == "exit":
-            write_to_history(HISTORY_FILE, input_str)
-            logging.info("Exit")
-            break
         else:
             command_not_found_error_message(command)
         write_to_history(HISTORY_FILE, input_str)
