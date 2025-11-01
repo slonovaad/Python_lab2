@@ -2,6 +2,7 @@ import os
 import logging
 import re
 
+from src.constants.colors import Color
 from src.error_messages import (not_exist_error_message, invalid_arguments_error_message,
                                 access_error_message, wrong_type_error_message,
                                 decode_error_message, invalid_option_error_message)
@@ -50,9 +51,9 @@ def grep(options: list[str], arguments: list[str]) -> None:
                     find_iterator = re.finditer(pattern, line)
                 for match in find_iterator:
                     if printing_ind == 0:
-                        print(f"\033[36m{index + 1}: \033[0m", end='')
+                        print(f"{Color.CYAN}{index + 1}: {Color.RESET}", end='')
                     print(line[printing_ind:match.start()], end='')
-                    print(f"\033[31m{match.group(0)}\033[0m", end='')
+                    print(f"{Color.RED}{match.group(0)}{Color.RESET}", end='')
                     printing_ind = match.end()
                 if printing_ind != 0:
                     print(line[printing_ind:], end='')
@@ -87,12 +88,12 @@ def grep(options: list[str], arguments: list[str]) -> None:
                                 find_iterator = re.finditer(pattern, line)
                             for match in find_iterator:
                                 if printing_ind == 0:
-                                    print(f"\033[35m{
+                                    print(f"{Color.MAGENTA}{
                                     os.path.relpath(abs_path, start=name)
-                                    }\033[36m: {index + 1}: \033[0m", end='')
+                                    }{Color.CYAN}: {index + 1}: {Color.RESET}", end='')
                                     have_printed = True
                                 print(line[printing_ind:match.start()], end='')
-                                print(f"\033[31m{match.group(0)}\033[0m", end='')
+                                print(f"{Color.RED}{match.group(0)}{Color.RESET}", end='')
                                 printing_ind = match.end()
                             if printing_ind != 0:
                                 print(line[printing_ind:], end='')

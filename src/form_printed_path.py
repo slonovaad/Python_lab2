@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from src.constants.colors import Color
 
 
 def form_printed_path(home: os.PathLike[str]) -> str:
@@ -10,9 +11,9 @@ def form_printed_path(home: os.PathLike[str]) -> str:
     """
     current_dir = Path(os.path.abspath(os.getcwd()))
     if home in current_dir.parents:
-        printed_path = f"\033[32m{home}\033[0m:\033[34m{
-        os.path.relpath(current_dir, start=home)}\033[0m> "
+        printed_path = f"{Color.GREEN}{home}{Color.RESET}:{Color.BLUE}{
+        os.path.relpath(current_dir, start=home)}{Color.RESET}> "
     else:
-        printed_path = f"\033[32m{current_dir}\033[0m> "
+        printed_path = f"{Color.GREEN}{current_dir}{Color.RESET}> "
 
     return printed_path

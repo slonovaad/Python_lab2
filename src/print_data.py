@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from src.constants.colors import Color
 
 
 def print_data(files: list[str], details: bool = False) -> None:
@@ -15,7 +16,7 @@ def print_data(files: list[str], details: bool = False) -> None:
     for item in files:
         size = os.path.getsize(item)
         if os.path.isdir(os.path.join(os.getcwd(), item)):
-            message += f"\033[34m{os.path.basename(item).ljust(50, ' ')}\033[0m"
+            message += f"{Color.BLUE}{os.path.basename(item).ljust(50, ' ')}{Color.RESET}"
         else:
             message += os.path.basename(item).ljust(50, ' ')
         if details:
