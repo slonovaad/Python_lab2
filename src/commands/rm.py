@@ -11,6 +11,24 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
                                 is_current_dir_error_message)
 
 
+def rm_validate(options: list[str], paths: list[str]) -> tuple[bool, bool]:
+    """
+    Функция, реализующая валидацию опций и аргументов команды rm
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: пройдена ли валидация, есть ли ключ -r
+    """
+    if len(paths) != 1 or len(options) > 1:
+        invalid_arguments_error_message("rm")
+        return False, False
+    if len(options) == 0:
+        return True, False
+    if options[0] == "-r":
+        return True, True
+    invalid_option_error_message("rm", options[0])
+    return False, False
+
+
 def rm(options: list[str], paths: list[str]) -> None:
     """
     Функция, реализующая команду rm
@@ -19,8 +37,8 @@ def rm(options: list[str], paths: list[str]) -> None:
     :return: Данная функция ничего не возвращает
     """
 
-    if len(options) > 1 or len(paths) != 1:
-        invalid_arguments_error_message("rm")
+    validated, recursive = rm_validate(options, paths)
+    if not validated:
         return
 
     name = os.path.abspath(paths[0])
@@ -45,8 +63,8 @@ def rm(options: list[str], paths: list[str]) -> None:
         access_error_message("rm", "file or directory", paths[0], action="remove")
         return
 
-    if len(options) == 0:
-        if not(os.path.isfile(name)):
+    if not (recursive):
+        if not (os.path.isfile(name)):
             wrong_type_error_message("rm", "file", paths[0])
             print("To remove a directory use -r")
             return
@@ -56,10 +74,7 @@ def rm(options: list[str], paths: list[str]) -> None:
         except PermissionError:
             access_error_message("rm", "file", paths[0], action="remove")
             return
-    if len(options) == 1:
-        if options[0] != "-r":
-            invalid_option_error_message("rm", options[0])
-            return
+    else:
         if not (os.path.isdir(name)):
             wrong_type_error_message("rm", "directory", paths[0])
             print("To remove a file don't use -r")

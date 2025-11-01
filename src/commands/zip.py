@@ -7,6 +7,26 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
                                 in_parents_error_message)
 
 
+def zip_validate(options: list[str], paths: list[str]) -> tuple[bool, str]:
+    """
+    Функция, реализующая валидацию опций и аргументов команды zip
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: пройдена ли валидация, путь-назначение
+    """
+    if not (1 <= len(paths) <= 2) or len(options) != 0:
+        invalid_arguments_error_message("zip")
+        return False, ""
+    if len(paths) == 2:
+        path = paths[1]
+    else:
+        if os.path.isdir(paths[0]):
+            path = paths[0] + ".zip"
+        else:
+            path = os.path.splitext(paths[0])[0] + ".zip"
+    return True, path
+
+
 def zip(options: list[str], paths: list[str]) -> None:
     """
     Функция, реализующая команду zip
@@ -15,20 +35,15 @@ def zip(options: list[str], paths: list[str]) -> None:
     :return: Данная функция ничего не возвращает
     """
 
-    if len(options) != 0 or not(1 <= len(paths) <= 2):
-        invalid_arguments_error_message("zip")
+    validated, path = zip_validate(options, paths)
+    if not validated:
         return
 
     source = os.path.abspath(paths[0])
-    if len(paths) == 2:
-        destination = os.path.abspath(paths[1])
-        if paths[1][-1] in "/\\":
-            destination = os.path.join(destination, os.path.basename(source) + ".zip")
-    else:
-        if os.path.isdir(source):
-            destination = source + ".zip"
-        else:
-            destination = os.path.splitext(source)[0] + ".zip"
+    destination = os.path.abspath(path)
+    if path[-1] in "/\\":
+        destination = os.path.join(destination, os.path.basename(source) + ".zip")
+
     if not (os.path.exists(source)):
         not_exist_error_message("zip", "directory", paths[0])
         return

@@ -21,7 +21,8 @@ class LsTestCase(unittest.TestCase):
             mock_listdir.return_value = ["file1", "file2"]
             ls([], [])
             mock_listdir.assert_called_once()
-            mock_print_data.assert_called_once_with(["file1", "file2"])
+            mock_print_data.assert_called_once_with([os.path.abspath("file1"),
+                                                     os.path.abspath("file2")], False)
             mock_log.assert_called_once_with("Success")
 
     def test_current_dir_not_allowed(self):
@@ -59,7 +60,8 @@ class LsTestCase(unittest.TestCase):
             mock_listdir.return_value = ["file1", "file2"]
             ls(["-l"], [])
             mock_listdir.assert_called_once()
-            mock_print_data.assert_called_once_with(["file1", "file2"], details=True)
+            mock_print_data.assert_called_once_with([os.path.abspath("file1"),
+                                                     os.path.abspath("file2")], True)
             mock_log.assert_called_once_with("Success")
 
     def test_current_dir_detais_not_allowed(self):
@@ -81,7 +83,7 @@ class LsTestCase(unittest.TestCase):
             mock_listdir.assert_called_once_with(os.path.abspath("dir"))
             mock_print_data.assert_called_once_with([
                 os.path.join(os.path.abspath("dir"), "file1"),
-                os.path.join(os.path.abspath("dir"), "file2")])
+                os.path.join(os.path.abspath("dir"), "file2")], False)
             mock_log.assert_called_once_with("Success")
 
     def test_given_home_dir(self):
@@ -93,7 +95,7 @@ class LsTestCase(unittest.TestCase):
             mock_listdir.assert_called_once_with(os.path.expanduser("~"))
             mock_print_data.assert_called_once_with([
                 os.path.join(os.path.expanduser("~"), "file1"),
-                os.path.join(os.path.expanduser("~"), "file2")])
+                os.path.join(os.path.expanduser("~"), "file2")], False)
             mock_log.assert_called_once_with("Success")
 
     def test_given_dir_not_allowed(self):
@@ -154,7 +156,7 @@ class LsTestCase(unittest.TestCase):
             mock_print_data.assert_called_once_with([
                 os.path.join(os.path.abspath("dir"), "file1"),
                 os.path.join(os.path.abspath("dir"), "file2")],
-                details=True)
+                True)
             mock_log.assert_called_once_with("Success")
 
     def test_given_dir_detais_not_allowed(self):

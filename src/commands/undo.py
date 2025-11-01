@@ -8,6 +8,19 @@ from src.parse import parse
 from src.error_messages import invalid_arguments_error_message, not_exist_error_message
 
 
+def undo_validate(options: list[str], arguments: list[str]) -> bool:
+    """
+    Функция, реализующая валидацию опций и аргументов команды undo
+    :param options: список флагов
+    :param arguments: список передаваемых аргументов
+    :return: пройдена ли валидация
+    """
+    if len(arguments) != 0 or len(options) != 0:
+        invalid_arguments_error_message("undo")
+        return False
+    return True
+
+
 def undo(options: list[str], arguments: list[str]) -> None:
     """
     Функция, реализующая команду undo
@@ -15,10 +28,9 @@ def undo(options: list[str], arguments: list[str]) -> None:
     :param arguments: список введённых аргументов
     :return: Данная функция ничего не возвращает
     """
-    if len(arguments) != 0 or len(options) != 0:
-        invalid_arguments_error_message("undo")
+    if not (undo_validate(options, arguments)):
         return
-    if not(os.path.exists(UNDO_HISTORY_FILE)):
+    if not (os.path.exists(UNDO_HISTORY_FILE)):
         not_exist_error_message("undo",
                                 "commands in history", "cp, mv, rm")
         return

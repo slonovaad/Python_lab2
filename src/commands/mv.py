@@ -10,6 +10,19 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
                                 is_current_dir_error_message)
 
 
+def mv_validate(options: list[str], paths: list[str]) -> bool:
+    """
+    Функция, реализующая валидацию опций и аргументов команды mv
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: пройдена ли валидация
+    """
+    if len(options) != 0 or len(paths) != 2:
+        invalid_arguments_error_message("mv")
+        return False
+    return True
+
+
 def mv(options: list[str], paths: list[str]) -> None:
     """
     Функция, реализующая команду mv
@@ -17,9 +30,7 @@ def mv(options: list[str], paths: list[str]) -> None:
     :param paths: список передаваемых путей
     :return: Данная функция ничего не возвращает
     """
-
-    if len(options) != 0 or len(paths) != 2:
-        invalid_arguments_error_message("mv")
+    if not (mv_validate(options, paths)):
         return
 
     source = os.path.abspath(paths[0])

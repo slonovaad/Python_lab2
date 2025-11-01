@@ -4,6 +4,18 @@ import logging
 from src.error_messages import (not_exist_error_message, invalid_arguments_error_message,
                                 access_error_message, wrong_type_error_message, )
 
+def unzip_validate(options: list[str], paths: list[str]) -> bool:
+    """
+    Функция, реализующая валидацию опций и аргументов команды unzip
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: пройдена ли валидация
+    """
+    if len(options) != 0 or len(paths) != 1:
+        invalid_arguments_error_message("unzip")
+        return False
+    return True
+
 
 def unzip(options: list[str], paths: list[str]) -> None:
     """
@@ -13,8 +25,7 @@ def unzip(options: list[str], paths: list[str]) -> None:
     :return: Данная функция ничего не возвращает
     """
 
-    if len(options) != 0 or len(paths) != 1:
-        invalid_arguments_error_message("unzip")
+    if not (unzip_validate(options, paths)):
         return
 
     name = os.path.abspath(paths[0])

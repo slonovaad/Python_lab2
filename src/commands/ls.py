@@ -6,6 +6,28 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
                                 wrong_type_error_message, )
 
 
+def ls_validate(options: list[str], paths: list[str]) -> tuple[bool, bool, str]:
+    """
+    Функция, реализующая валидацию опций и аргументов команды ls
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: пройдена ли валидация, есть ли ключ -l, путь
+    """
+    if len(paths) > 1 or len(options) > 1:
+        invalid_arguments_error_message("ls")
+        return False, False, ""
+    if len(paths) == 0:
+        path = os.getcwd()
+    else:
+        path = paths[0]
+    if len(options) == 0:
+        return True, False, path
+    if options[0] == "-l":
+        return True, True, path
+    invalid_option_error_message("ls", options[0])
+    return False, False, ""
+
+
 def ls(options: list[str], paths: list[str]) -> None:
     """
     Функция, реализующая команду ls
@@ -13,64 +35,25 @@ def ls(options: list[str], paths: list[str]) -> None:
     :param paths: список передаваемых путей
     :return: Данная функция ничего не возвращает
     """
-    if len(paths) == 0:
-        if len(options) == 1:
-            if options[0] == '-l':
-                try:
-                    print_data(os.listdir(), details=True)
-                except PermissionError:
-                    access_error_message("ls", "directory", os.getcwd())
-                    return
-            else:
-                invalid_option_error_message("ls", options[0])
-                return
-        elif len(options) == 0:
-            try:
-                print_data(os.listdir())
-            except PermissionError:
-                access_error_message("ls", "directory", os.getcwd())
-                return
-        else:
-            invalid_arguments_error_message("ls")
-            return
-    elif len(paths) == 1:
-        name = os.path.abspath(paths[0])
-        if paths[0] == "~":
-            name = os.path.expanduser("~")
-        if len(options) == 1:
-            if options[0] == '-l':
-                try:
-                    content = os.listdir(name)
-                    content = [os.path.join(name, item) for item in content]
-                    print_data(content, details=True)
-                except FileNotFoundError:
-                    not_exist_error_message("ls", "directory", paths[0])
-                    return
-                except PermissionError:
-                    access_error_message("ls", "directory", paths[0])
-                    return
-            else:
-                invalid_option_error_message("ls", options[0])
-                return
-        elif len(options) == 0:
-            try:
-                content = os.listdir(name)
-                content = [os.path.join(name, item) for item in content]
-                print_data(content)
-            except FileNotFoundError:
-                not_exist_error_message("ls", "directory", paths[0])
-                return
-            except PermissionError:
-                access_error_message("ls", "directory", paths[0])
-                return
-            except NotADirectoryError:
-                wrong_type_error_message("ls", "directory", paths[0])
-                return
-        else:
-            invalid_arguments_error_message("ls")
-            return
+    validated, details, path = ls_validate(options, paths)
+    if not validated:
+        return
+    if path == "~":
+        name = os.path.expanduser("~")
     else:
-        invalid_arguments_error_message("ls")
+        name = os.path.abspath(path)
+    try:
+        content = os.listdir(name)
+        content = [os.path.join(name, item) for item in content]
+        print_data(content, details)
+    except FileNotFoundError:
+        not_exist_error_message("ls", "directory", paths[0] if len(paths) > 0 else path)
+        return
+    except PermissionError:
+        access_error_message("ls", "directory", paths[0] if len(paths) > 0 else path)
+        return
+    except NotADirectoryError:
+        wrong_type_error_message("ls", "directory", paths[0] if len(paths) > 0 else path)
         return
 
     logging.info("Success")

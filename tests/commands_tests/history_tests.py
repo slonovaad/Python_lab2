@@ -39,5 +39,5 @@ class HistoryTestCase(unittest.TestCase):
         with (patch("src.commands.history.invalid_arguments_error_message") as mock_error,
               patch("src.commands.history.open") as mock_open):
             history([], ["aa"])
-            mock_open.assert_called_once_with(HISTORY_FILE, "r", encoding="utf-8")
+            mock_open.assert_not_called()
             mock_error.assert_called_once_with("history")

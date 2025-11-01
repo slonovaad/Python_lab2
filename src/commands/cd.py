@@ -4,6 +4,19 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
                                 access_error_message, wrong_type_error_message)
 
 
+def cd_validate(options: list[str], paths: list[str]) -> bool:
+    """
+    Функция, реализующая валидацию опций и аргументов команды cd
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: пройдена ли валидация
+    """
+    if len(paths) != 1 or len(options) != 0:
+        invalid_arguments_error_message("cd")
+        return False
+    return True
+
+
 def cd(options: list[str], paths: list[str]) -> None:
     """
     Функция, реализующая команду cd
@@ -11,8 +24,7 @@ def cd(options: list[str], paths: list[str]) -> None:
     :param paths: список передаваемых путей
     :return: Данная функция ничего не возвращает
     """
-    if len(paths) != 1 or len(options) != 0:
-        invalid_arguments_error_message("cd")
+    if not (cd_validate(options, paths)):
         return
     name = paths[0]
     if name == '~':

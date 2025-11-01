@@ -5,6 +5,19 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
                                 access_error_message, wrong_type_error_message, )
 
 
+def untar_validate(options: list[str], paths: list[str]) -> bool:
+    """
+    Функция, реализующая валидацию опций и аргументов команды untar
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: пройдена ли валидация
+    """
+    if len(options) != 0 or len(paths) != 1:
+        invalid_arguments_error_message("untar")
+        return False
+    return True
+
+
 def untar(options: list[str], paths: list[str]) -> None:
     """
     Функция, реализующая команду unzip
@@ -13,8 +26,7 @@ def untar(options: list[str], paths: list[str]) -> None:
     :return: Данная функция ничего не возвращает
     """
 
-    if len(options) != 0 or len(paths) != 1:
-        invalid_arguments_error_message("untar")
+    if not(untar_validate(options, paths)):
         return
 
     name = os.path.abspath(paths[0])

@@ -6,25 +6,38 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
                                 decode_error_message, invalid_option_error_message)
 
 
+def grep_validate(options: list[str], arguments: list[str]) -> tuple[bool, bool, bool]:
+    """
+    Функция, реализующая валидацию опций и аргументов команды grep
+    :param options: список флагов
+    :param arguments: список передаваемых аргументов
+    :return: пройдена ли валидация, есть ли ключ -r, есть ли ключ -i
+    """
+    if len(arguments) != 2 or len(options) > 2:
+        invalid_arguments_error_message("grep")
+        return False, False, False
+    if len(options) > 0:
+        if options[0] not in ["-i", "-r"]:
+            invalid_option_error_message("grep", options[0])
+            return False, False, False
+    if len(options) > 1:
+        if options[1] not in ["-i", "-r"]:
+            invalid_option_error_message("grep", options[1])
+            return False, False, False
+    return True, "-r" in options, "-i" in options
+
+
 def grep(options: list[str], arguments: list[str]) -> None:
     """
     Функция, реализующая команду grep
     :param options: список флагов
-    :param arguments: список передаваемых фргументов
+    :param arguments: список передаваемых аргументов
     (шаблон и путь)
     :return: Данная функция ничего не возвращает
     """
-    if len(arguments) != 2 or len(options) > 2:
-        invalid_arguments_error_message("grep")
+    validated, recursive, ignor_case = grep_validate(options, arguments)
+    if not validated:
         return
-    if len(options) > 0:
-        if options[0] not in ["-i", "-r"]:
-            invalid_option_error_message("grep", options[0])
-            return
-    if len(options) > 1:
-        if options[1] not in ["-i", "-r"]:
-            invalid_option_error_message("grep", options[1])
-            return
 
     name = os.path.abspath(arguments[1])
     pattern = arguments[0]
@@ -34,14 +47,14 @@ def grep(options: list[str], arguments: list[str]) -> None:
         return
 
     if os.path.isfile(name):
-        if "-r" in options:
+        if recursive:
             wrong_type_error_message("grep", "directory", arguments[1])
             print("To work with a file don't use -r")
             return
         try:
             with open(name, "r", encoding="utf-8") as file:
                 lines = file.readlines()
-            print_matches(lines, pattern, "-i" in options)
+            print_matches(lines, pattern, ignor_case)
             print()
         except PermissionError:
             access_error_message("grep", "file", name)
@@ -50,7 +63,7 @@ def grep(options: list[str], arguments: list[str]) -> None:
             decode_error_message("grep", name)
 
     if os.path.isdir(name):
-        if "-r" not in options:
+        if not (recursive):
             wrong_type_error_message("grep", "file", arguments[1])
             print("To work with a directory use -r")
             return
@@ -62,7 +75,7 @@ def grep(options: list[str], arguments: list[str]) -> None:
                         with open(abs_path, "r",
                                   encoding="utf-8") as reading_file:
                             lines = reading_file.readlines()
-                        if print_matches(lines, pattern, "-i" in options, os.path.relpath(abs_path, start=name)):
+                        if print_matches(lines, pattern, ignor_case, os.path.relpath(abs_path, start=name)):
                             print()
                     except PermissionError:
                         print(f"{"grep"} {

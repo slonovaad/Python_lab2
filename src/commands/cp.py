@@ -10,6 +10,24 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
                                 wrong_type_error_message, in_parents_error_message)
 
 
+def cp_validate(options: list[str], paths: list[str]) -> tuple[bool, bool]:
+    """
+    Функция, реализующая валидацию опций и аргументов команды cp
+    :param options: список флагов
+    :param paths: список передаваемых путей
+    :return: пройдена ли валидация, есть ли ключ -r
+    """
+    if len(paths) != 2 or len(options) > 1:
+        invalid_arguments_error_message("cp")
+        return False, False
+    if len(options) == 0:
+        return True, False
+    if options[0] == "-r":
+        return True, True
+    invalid_option_error_message("cp", options[0])
+    return False, False
+
+
 def cp(options: list[str], paths: list[str]) -> None:
     """
     Функция, реализующая команду cp
@@ -17,8 +35,8 @@ def cp(options: list[str], paths: list[str]) -> None:
     :param paths: список передаваемых путей
     :return: Данная функция ничего не возвращает
     """
-    if len(paths) != 2 or len(options) > 1:
-        invalid_arguments_error_message("cp")
+    validated, recursive = cp_validate(options, paths)
+    if not validated:
         return
     source = os.path.abspath(paths[0])
     destination = os.path.abspath(paths[1])
@@ -32,7 +50,7 @@ def cp(options: list[str], paths: list[str]) -> None:
     if not (os.path.exists(source)):
         not_exist_error_message("cp", "file or directory", paths[0])
         return
-    if len(options) == 0:
+    if not (recursive):
         if not (os.path.isfile(source)):
             wrong_type_error_message("cp", "file", paths[0])
             print("To copy a directory use -r")
@@ -51,11 +69,7 @@ def cp(options: list[str], paths: list[str]) -> None:
                                  f"{paths[0]} or {paths[1]}", action="read or change")
             return
 
-    if len(options) == 1:
-        option = options[0]
-        if option != '-r':
-            invalid_option_error_message("cp", option)
-            return
+    else:
         if not (os.path.isdir(source)):
             wrong_type_error_message("cp", "directory", paths[0])
             print("To copy a file don't use -r")
