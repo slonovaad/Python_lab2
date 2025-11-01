@@ -141,12 +141,12 @@ class CpTestCase(unittest.TestCase):
             mock_exist.return_value = True
             mock_isfile.return_value = True
             mock_copy.side_effect = PermissionError
-            cp([], ["file", "directory\\"])
-            mock_makedirs.assert_called_once_with(os.path.abspath("directory\\"), exist_ok=True)
+            cp([], ["file", "directory/"])
+            mock_makedirs.assert_called_once_with(os.path.abspath("directory/"), exist_ok=True)
             mock_copy.assert_called_once_with(os.path.abspath("file"),
                                               os.path.abspath(os.path.join("directory", "file")))
             mock_copytree.assert_not_called()
-            mock_error.assert_called_once_with("cp", "file or directory", "file or directory\\",
+            mock_error.assert_called_once_with("cp", "file or directory", "file or directory/",
                                                action="read or change")
             mock_reserve_copy.assert_called_once_with(os.path.abspath(os.path.join("directory", "file")))
             mock_undo_history.assert_not_called()

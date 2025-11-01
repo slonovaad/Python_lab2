@@ -1,6 +1,7 @@
 import os
 import shutil
-from src.constants.constants import HISTORY_FILE, TRASH_DIRECTORY
+from src.constants.constants import TRASH_DIRECTORY
+from src.get_command_number import get_command_number
 
 
 def make_reserve_copy(path) -> None:
@@ -12,12 +13,7 @@ def make_reserve_copy(path) -> None:
     """
     if not(os.path.exists(TRASH_DIRECTORY)):
         os.makedirs(TRASH_DIRECTORY)
-    if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, 'r', encoding='utf-8') as history_file:
-            lines = history_file.readlines()
-        current_number = int(lines[-1].split()[0]) + 1
-    else:
-        current_number = 1
+    current_number = get_command_number()
     new_path = os.path.join(TRASH_DIRECTORY, f"{current_number}_" + os.path.basename(path))
     if os.path.isfile(path):
         shutil.copy(path, new_path)

@@ -44,6 +44,7 @@
     |   |   │   ├──constants.py                    # Константы
     |   │   ├──__init__.py
     |   │   ├──error_messanges.py              # Функции, выводящие в терминал и лог-файл сообщения об ошибках
+    |   │   ├──get_command_number.py           # Фунция, вычисляющая номер в истории последней введённой команды
     |   │   ├──main.py                         # Точка входа в приложение
     |   │   ├──make_reserve_copy.py            # Функция, выполняющая копирование файла во временный каталог .trash
     |   │   ├──parse.py                        # Функция, реализующая парсинг строки
@@ -66,6 +67,7 @@
     |   |   │   ├──unzip_tests.py              # Тесты для команды unzip
     |   |   │   ├──zip_tests.py                # Тесты для команды zip
     |   │   ├──__init__.py
+    |   │   ├──get_command_number_tests.py     # Тесты функции get_command_number
     |   │   ├──main_tests.py                   # Тесты функции main
     |   │   ├──make_reserve_copy_tests.py      # Тесты функции make_reserve_copy
     |   │   ├──parse_tests.py                  # Тесты функции parse
