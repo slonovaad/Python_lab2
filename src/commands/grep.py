@@ -1,8 +1,6 @@
 import os
 import logging
-import re
-
-from src.constants.colors import Color
+from src.print_matches import print_matches
 from src.error_messages import (not_exist_error_message, invalid_arguments_error_message,
                                 access_error_message, wrong_type_error_message,
                                 decode_error_message, invalid_option_error_message)
@@ -10,7 +8,7 @@ from src.error_messages import (not_exist_error_message, invalid_arguments_error
 
 def grep(options: list[str], arguments: list[str]) -> None:
     """
-    Функция, реализующая команду cat
+    Функция, реализующая команду grep
     :param options: список флагов
     :param arguments: список передаваемых фргументов
     (шаблон и путь)
@@ -43,22 +41,8 @@ def grep(options: list[str], arguments: list[str]) -> None:
         try:
             with open(name, "r", encoding="utf-8") as file:
                 lines = file.readlines()
-            for index, line in enumerate(lines):
-                printing_ind = 0
-                if "-i" in options:
-                    find_iterator = re.finditer(pattern, line, re.IGNORECASE)
-                else:
-                    find_iterator = re.finditer(pattern, line)
-                for match in find_iterator:
-                    if printing_ind == 0:
-                        print(f"{Color.CYAN}{index + 1}: {Color.RESET}", end='')
-                    print(line[printing_ind:match.start()], end='')
-                    print(f"{Color.RED}{match.group(0)}{Color.RESET}", end='')
-                    printing_ind = match.end()
-                if printing_ind != 0:
-                    print(line[printing_ind:], end='')
+            print_matches(lines, pattern, "-i" in options)
             print()
-
         except PermissionError:
             access_error_message("grep", "file", name)
             return
@@ -78,26 +62,7 @@ def grep(options: list[str], arguments: list[str]) -> None:
                         with open(abs_path, "r",
                                   encoding="utf-8") as reading_file:
                             lines = reading_file.readlines()
-                        have_printed = False
-                        for index, line in enumerate(lines):
-                            have_printed = False
-                            printing_ind = 0
-                            if "-i" in options:
-                                find_iterator = re.finditer(pattern, line, re.IGNORECASE)
-                            else:
-                                find_iterator = re.finditer(pattern, line)
-                            for match in find_iterator:
-                                if printing_ind == 0:
-                                    print(f"{Color.MAGENTA}{
-                                    os.path.relpath(abs_path, start=name)
-                                    }{Color.CYAN}: {index + 1}: {Color.RESET}", end='')
-                                    have_printed = True
-                                print(line[printing_ind:match.start()], end='')
-                                print(f"{Color.RED}{match.group(0)}{Color.RESET}", end='')
-                                printing_ind = match.end()
-                            if printing_ind != 0:
-                                print(line[printing_ind:], end='')
-                        if have_printed:
+                        if print_matches(lines, pattern, "-i" in options, os.path.relpath(abs_path, start=name)):
                             print()
                     except PermissionError:
                         print(f"{"grep"} {
