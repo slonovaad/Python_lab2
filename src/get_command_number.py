@@ -6,7 +6,7 @@ from src.constants.constants import HISTORY_FILE
 def get_command_number() -> int:
     """
     Функция, которая определяет номер последней записанной в историю команды
-    :return int: Номер команды
+    :return: Номер команды
     """
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, 'r', encoding='utf-8') as history_file:

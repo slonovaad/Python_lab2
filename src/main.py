@@ -8,6 +8,7 @@ from src.constants.commands_constants import COMMANDS
 from src.error_messages import command_not_found_error_message
 from src.parse import parse
 from src.write_to_history import write_to_history
+from src.form_printed_path import form_printed_path
 
 
 def main() -> None:
@@ -21,14 +22,7 @@ def main() -> None:
                         format="[%(asctime)s] %(levelname)s: %(message)s",
                         datefmt="%Y-%m-%d %H:%M:%S")
     home = Path(os.path.expanduser("~"))
-    while True:
-        current_dir = Path(os.path.abspath(os.getcwd()))
-        if home in current_dir.parents:
-            printed_path = f"\033[32m{home}\033[0m:\033[34m{
-            os.path.relpath(current_dir, start=home)}\033[0m> "
-        else:
-            printed_path = f"\033[32m{current_dir}\033[0m> "
-        input_str = input(printed_path)
+    while (input_str := input(form_printed_path(home))) != "exit":
         logging.info(input_str)
         try:
             command, options, arguments = parse(input_str)
