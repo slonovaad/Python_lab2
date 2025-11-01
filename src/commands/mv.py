@@ -24,6 +24,7 @@ def mv(options: list[str], paths: list[str]) -> None:
 
     source = os.path.abspath(paths[0])
     destination = os.path.abspath(paths[1])
+    current_dir = os.getcwd()
     if paths[1][-1] in "/\\":
         destination = os.path.join(destination, os.path.basename(source))
     if not (os.path.exists(source)):
@@ -37,10 +38,10 @@ def mv(options: list[str], paths: list[str]) -> None:
             or Path(TRASH_DIRECTORY) in Path(destination).parents):
         access_error_message("mv", "file or directory", paths[1], action="change")
         return
-    if source == os.getcwd():
+    if source == current_dir:
         is_current_dir_error_message("mv", paths[0], action="move")
         return
-    if destination == os.getcwd():
+    if destination == current_dir:
         is_current_dir_error_message("mv", paths[1], action="move")
         return
     if Path(source) in Path(destination).parents:
