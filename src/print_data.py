@@ -11,15 +11,17 @@ def print_data(files: list[str], details: bool = False) -> None:
     (размер, время изменения, права доступа)
     :return: Данная функция ничего не возвращает
     """
+    message = ""
     for item in files:
         size = os.path.getsize(item)
         if os.path.isdir(os.path.join(os.getcwd(), item)):
-            print(f'\033[34m{os.path.basename(item).ljust(50, ' ')}\033[0m', end ='')
+            message += f"\033[34m{os.path.basename(item).ljust(50, ' ')}\033[0m"
         else:
-            print(os.path.basename(item).ljust(50, ' '), end='')
+            message += os.path.basename(item).ljust(50, ' ')
         if details:
             change_time = datetime.fromtimestamp(os.path.getmtime(item)).strftime('%Y-%m-%d %H:%M')
             rights = os.stat(item).st_mode
-            print(f"{str(size).ljust(10, ' ')}   {change_time}   {rights}")
-        else:
-            print()
+            message += f"{str(size).ljust(10, ' ')}   {change_time}   {rights}"
+
+        message += "\n"
+    print(message, end="")
