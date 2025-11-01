@@ -22,18 +22,21 @@ def main() -> None:
                         format="[%(asctime)s] %(levelname)s: %(message)s",
                         datefmt="%Y-%m-%d %H:%M:%S")
     home = Path(os.path.expanduser("~"))
-    while (input_str := input(form_printed_path(home))) != "exit":
-        logging.info(input_str)
-        try:
-            command, options, arguments = parse(input_str)
-        except AttributeError:
-            logging.info("Blank line")
-            continue
-        if command in COMMANDS:
-            COMMANDS[command](options, arguments)
-        else:
-            command_not_found_error_message(command)
-        write_to_history(HISTORY_FILE, input_str)
+    try:
+        while (input_str := input(form_printed_path(home))) != "exit":
+            logging.info(input_str)
+            try:
+                command, options, arguments = parse(input_str)
+            except AttributeError:
+                logging.info("Blank line")
+                continue
+            if command in COMMANDS:
+                COMMANDS[command](options, arguments)
+            else:
+                command_not_found_error_message(command)
+            write_to_history(HISTORY_FILE, input_str)
+    except KeyboardInterrupt:
+        pass
     if os.path.exists(TRASH_DIRECTORY):
         shutil.rmtree(TRASH_DIRECTORY)
     if os.path.exists(UNDO_HISTORY_FILE):
