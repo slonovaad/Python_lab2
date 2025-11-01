@@ -41,36 +41,20 @@ def undo(options: list[str], arguments: list[str]) -> None:
             os.remove(name)
         if os.path.isdir(name):
             shutil.rmtree(name)
-        recovering_path = os.path.join(TRASH_DIRECTORY, f"{number}_" + os.path.basename(name))
-        if os.path.exists(recovering_path):
-            if os.path.isfile(recovering_path):
-                shutil.copy(recovering_path, name)
-                os.remove(recovering_path)
-            if os.path.isdir(recovering_path):
-                shutil.copytree(recovering_path, name)
-                shutil.rmtree(recovering_path)
     if command == "mv":
         source = os.path.abspath(paths[0])
-        destination = os.path.abspath(paths[1])
-        os.rename(destination, source)
-        recovering_path = os.path.join(TRASH_DIRECTORY, f"{number}_" + os.path.basename(destination))
-        if os.path.exists(recovering_path):
-            if os.path.isfile(recovering_path):
-                shutil.copy(recovering_path, destination)
-                os.remove(recovering_path)
-            if os.path.isdir(recovering_path):
-                shutil.copytree(recovering_path, destination)
-                shutil.rmtree(recovering_path)
+        name = os.path.abspath(paths[1])
+        os.rename(name, source)
     if command == "rm":
         name = os.path.abspath(paths[0])
-        recovering_path = os.path.join(TRASH_DIRECTORY, f"{number}_" + os.path.basename(name))
-        if os.path.exists(recovering_path):
-            if os.path.isfile(recovering_path):
-                shutil.copy(recovering_path, name)
-                os.remove(recovering_path)
-            if os.path.isdir(recovering_path):
-                shutil.copytree(recovering_path, name)
-                shutil.rmtree(recovering_path)
+    recovering_path = os.path.join(TRASH_DIRECTORY, f"{number}_" + os.path.basename(name))
+    if os.path.exists(recovering_path):
+        if os.path.isfile(recovering_path):
+            shutil.copy(recovering_path, name)
+            os.remove(recovering_path)
+        if os.path.isdir(recovering_path):
+            shutil.copytree(recovering_path, name)
+            shutil.rmtree(recovering_path)
 
     with open(UNDO_HISTORY_FILE, "w", encoding="utf-8") as history_file:
         history_file.writelines(lines[:-1])
